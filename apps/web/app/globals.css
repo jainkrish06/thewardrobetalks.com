@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-cream: #FAF7F2;
+  --color-ivory: #F4EDE2;
+  --color-burgundy: #7B2D26;
+  --color-gold: #C9A961;
+  --color-ink: #1a1a1a;
+}
+
+html { scroll-behavior: smooth; }
+
+.font-serif { font-family: var(--font-serif), 'Marcellus', Georgia, serif; }
+.font-sans { font-family: var(--font-sans), 'Inter', system-ui, sans-serif; }
+
+.tracking-luxury { letter-spacing: 0.18em; }
+
+/* Hide scrollbar but allow scroll */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Gold underline animation */
+.gold-underline { position: relative; }
+.gold-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--color-gold);
+  transition: width 0.4s ease;
+}
+.gold-underline:hover::after { width: 100%; }
+
+/* Image zoom on hover */
+.zoom-img { overflow: hidden; }
+.zoom-img img { transition: transform 0.8s ease; }
+.zoom-img:hover img { transform: scale(1.06); }
+
+/* Fade-in */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.8s ease forwards; }

@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = "apps/web/.next"
+
+[functions]
+  included_files = ["db_backup.json", "apps/web/db_backup.json"]
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

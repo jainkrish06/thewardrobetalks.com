@@ -1,0 +1,21 @@
+{
+  "name": "wardrobe-talks-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "apps/admin"
+  ],
+  "scripts": {
+    "build": "npm run build:web",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:admin": "npm run dev --workspace=apps/admin",
+    "build:web": "npm run build --workspace=apps/web",
+    "build:admin": "npm run build --workspace=apps/admin",
+    "lint:web": "npm run lint --workspace=apps/web",
+    "lint:admin": "npm run lint --workspace=apps/admin"
+  },
+  "devDependencies": {
+    "dotenv": "^17.4.2"
+  }
+}

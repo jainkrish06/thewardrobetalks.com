@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build:admin"
+  publish = "apps/admin/.next"
+
+[build.environment]
+  NEXT_PUBLIC_API_URL = "https://wardrobe-talks-couture.netlify.app"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
