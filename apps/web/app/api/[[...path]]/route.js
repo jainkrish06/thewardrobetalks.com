@@ -21,25 +21,39 @@ let seeded = false
 
 async function connectToMongo() {
   const url = process.env.MONGO_URL
-  if (!url) return null
-  // In cloud environments like Netlify/Vercel, skip if MONGO_URL still points to local mongodb
-  if ((process.env.NETLIFY || process.env.VERCEL || process.env.NODE_ENV === 'production') && url.includes('localhost')) {
+  if (!url) {
+    console.warn('⚠️ connectToMongo: No MONGO_URL specified in environment.')
     return null
   }
+  
   if (!client) {
-    client = new MongoClient(url, {
-      serverSelectionTimeoutMS: 2500,
-      connectTimeoutMS: 2500
-    })
-    await client.connect()
+    try {
+      client = new MongoClient(url, {
+        serverSelectionTimeoutMS: 5000,
+        connectTimeoutMS: 5000,
+        maxPoolSize: 10,
+        minPoolSize: 1
+      })
+      await client.connect()
+      console.log('✅ Connected to MongoDB successfully.')
+    } catch (err) {
+      console.error('❌ Failed to connect to MongoDB:', err.message)
+      client = null
+      return null
+    }
   }
-  if (!db) {
+  if (!db && client) {
     db = client.db(process.env.DB_NAME || 'wardrobe_talks')
   }
   return db
 }
 
 const AUTH_SECRET = process.env.AUTH_SECRET || 'local_auth_secret_secure_key_12345'
+
+function escapeRegex(string) {
+  if (typeof string !== 'string') return ''
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
 
 // Response Formatter Helpers
 function sendSuccess(data, status = 200) {
@@ -731,9 +745,10 @@ async function handleRoute(request, { params }) {
         const query = {}
         if (category) query.category = category
         if (q) {
+          const safeQ = escapeRegex(q)
           query.$or = [
-            { title: { $regex: q, $options: 'i' } },
-            { description: { $regex: q, $options: 'i' } }
+            { title: { $regex: safeQ, $options: 'i' } },
+            { description: { $regex: safeQ, $options: 'i' } }
           ]
         }
         total = await db.collection('products').countDocuments(query)
