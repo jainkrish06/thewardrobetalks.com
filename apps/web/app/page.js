@@ -1007,10 +1007,7 @@ const ContactView = ({ settings }) => {
 
 /* ------------------------------ Footer ------------------------------ */
 const getAdminUrl = () => {
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return 'https://wardrobe-talks-admin.netlify.app'
-  }
-  return process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001'
+  return process.env.NEXT_PUBLIC_ADMIN_URL || '/admin'
 }
 
 const Footer = ({ navigate, settings }) => (
@@ -1054,6 +1051,7 @@ function App() {
   const [products, setProducts] = useState([])
   const [gallery, setGallery] = useState([])
   const [hero, setHero] = useState([])
+  const [blogs, setBlogs] = useState([])
   const [settings, setSettings] = useState({})
   const [loaded, setLoaded] = useState(false)
 
@@ -1065,8 +1063,9 @@ function App() {
       api.get('/products').catch(() => []),
       api.get('/gallery').catch(() => []),
       api.get('/hero').catch(() => []),
+      api.get('/blogs').catch(() => []),
       api.get('/settings').catch(() => ({})),
-    ]).then(([p, g, h, s]) => {
+    ]).then(([p, g, h, b, s]) => {
       const pData = p?.data !== undefined ? p.data : p
       const items = pData && pData.items ? pData.items : Array.isArray(pData) ? pData : []
       if (Array.isArray(items)) setProducts(items)
@@ -1076,6 +1075,10 @@ function App() {
 
       const hData = h?.data !== undefined ? h.data : h
       if (Array.isArray(hData)) setHero(hData)
+
+      const bData = b?.data !== undefined ? b.data : b
+      const bItems = bData && bData.items ? bData.items : Array.isArray(bData) ? bData : []
+      if (Array.isArray(bItems)) setBlogs(bItems)
 
       const sData = s?.data !== undefined ? s.data : s
       if (sData && typeof sData === 'object') setSettings(sData)
@@ -1092,6 +1095,8 @@ function App() {
       case 'men': return <CollectionView navigate={navigate} products={products} category="Men" />
       case 'celebrity': return <CollectionView navigate={navigate} products={products} category="Celebrity" />
       case 'product': return <ProductView navigate={navigate} productId={params.id} settings={settings} />
+      case 'blogs': return <BlogsView navigate={navigate} blogs={blogs} />
+      case 'blog-detail': return <BlogDetailView blogId={params.id} navigate={navigate} />
       case 'about': return <AboutView settings={settings} />
       case 'contact': return <ContactView settings={settings} />
       default: return <HomeView navigate={navigate} products={products} gallery={gallery} settings={settings} hero={hero} />
