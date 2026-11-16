@@ -1,5 +1,5 @@
 [build]
-  command = "yarn --cwd apps/web build"
+  command = "npm run build --workspace=apps/web"
   publish = "apps/web/.next"
 
 [[plugins]]
