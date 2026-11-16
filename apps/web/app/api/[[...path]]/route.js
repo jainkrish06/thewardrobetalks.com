@@ -56,8 +56,12 @@ function escapeRegex(string) {
 }
 
 // Response Formatter Helpers
-function sendSuccess(data, status = 200) {
-  return handleCORS(NextResponse.json({ success: true, data }, { status }))
+function sendSuccess(data, status = 200, cacheSeconds = 0) {
+  const res = NextResponse.json({ success: true, data }, { status })
+  if (cacheSeconds > 0) {
+    res.headers.set('Cache-Control', 'public, s-maxage=' + cacheSeconds + ', stale-while-revalidate=' + (cacheSeconds * 3))
+  }
+  return handleCORS(res)
 }
 
 function sendError(code, message, status = 400) {
@@ -457,7 +461,7 @@ async function handleRoute(request, { params }) {
       return sendSuccess(rest)
     }
 
-    // PUBLIC: GET PRODUCTS
+    // PUBLIC: GET PRODUCTS (Edge Cached)
     if (route === '/products' && method === 'GET') {
       const url = new URL(request.url)
       const category = url.searchParams.get('category')
@@ -526,7 +530,7 @@ async function handleRoute(request, { params }) {
       return sendSuccess({ ...rest, related: related.map(({ _id, ...r }) => r) })
     }
 
-    // PUBLIC: GET HERO SLIDES
+    // PUBLIC: GET HERO SLIDES (Edge Cached)
     if (route === '/hero' && method === 'GET') {
       let items = []
       if (db) {
@@ -534,7 +538,7 @@ async function handleRoute(request, { params }) {
       } else {
         items = readBackupData('heroSlides').filter(h => h.active !== false).sort((a, b) => (a.order || 0) - (b.order || 0))
       }
-      return sendSuccess(items.map(({ _id, ...r }) => r))
+      return sendSuccess(items.map(({ _id, ...r }) => r), 200, 120)
     }
 
     // PUBLIC: GET GALLERY
